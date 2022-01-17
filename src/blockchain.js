@@ -65,6 +65,13 @@ class Blockchain {
         let self = this;
         return new Promise(async (resolve, reject) => {
             try{
+                self.validateChain().then(data => {
+                    if(Array.isArray(data)) {
+                        reject(data)
+                    } else {
+                        console.log("_addBlock valid chain")
+                    }
+                })
                 //assign height
                 block.height = self.height++
                 //assign previous block hash
@@ -77,7 +84,6 @@ class Blockchain {
                 //push block
                 self.chain.push(block)
                 resolve(block)
-                console.log(self.height)
             } catch (error) {
                 reject(error)
             }
@@ -119,7 +125,7 @@ class Blockchain {
     submitStar(address, message, signature, star) {
         let self = this;
         return new Promise(async (resolve, reject) => {
-            const FIVE_MIN=5*60*1000
+            const FIVE_MIN=300
             //get time from message sent
             let messageTime = parseInt(message.split(':')[1])
             //get current time
@@ -196,16 +202,18 @@ class Blockchain {
         let self = this;
         let errorLog = [];
         return new Promise(async (resolve, reject) => {
-            let reverseChain = self.chain.reverse()
-            for(const block of reverseChain) {
-                block.validate().then(result => {
+            for(let i = 0; i<self.chain.length; i++) {
+                self.chain[i].validate().then(result => {
                     if(result === "INVALID") {
-                        errorLog.push(block)
-                        //validate function checks previous hash
+                        errorLog.push(i)
                     }
-                })
+                    //validate function checks previous hash
+                    if(self.chain.height > 0 && self.chain[i].previousBlockHash !== self.chain[i-1].hash) {
+                        errorLog.push(i)
+                    }
+                }).catch(error => console.log(error))
             }
-            return errorLog
+            errorLog.length === 0 ? resolve("Valid Chain") : reject (errorLog)
         });
     }
 
