@@ -75,8 +75,9 @@ class Blockchain {
                 //assign height
                 block.height = self.height++
                 //assign previous block hash
-                let previousBlock = self.chain.indexOf(self.height)
-                block.previousBlockHash = previousBlock.hash
+                if(self.height !== 0) {
+                    block.previousBlockHash = self.chain[self.height - 1].hash
+                }
                 //assign timestamp
                 block.time = Date.now()
                 //create block hash
@@ -125,7 +126,7 @@ class Blockchain {
     submitStar(address, message, signature, star) {
         let self = this;
         return new Promise(async (resolve, reject) => {
-            const FIVE_MIN=300
+            const FIVE_MIN=30000
             //get time from message sent
             let messageTime = parseInt(message.split(':')[1])
             //get current time

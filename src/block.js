@@ -45,7 +45,7 @@ class Block {
             let calculatedHash = SHA256(JSON.stringify(self)).toString()
             // Comparing if the hashes changed
             let matching = currentHash === calculatedHash
-            self.hash = calculatedHash
+            self.hash = currentHash
             // Returning the Block is valid or not
             matching ? resolve(self) : reject("INVALID")
         });
