@@ -47,7 +47,7 @@ class Block {
             let matching = currentHash === calculatedHash
             self.hash = currentHash
             // Returning the Block is valid or not
-            matching ? resolve(self) : reject("INVALID")
+            matching ? resolve(false) : reject(true)
         });
     }
 
@@ -69,7 +69,8 @@ class Block {
         // Parse the data to an object to be retrieve.
             let data = JSON.parse(decodedData)
         // Resolve with the data if the object isn't the Genesis block
-            self.height <= 1 ? resolve(data) : reject("Error, genesis block")
+            console.log(self.height)
+            resolve(data)
         }))
     }
 

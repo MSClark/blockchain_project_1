@@ -66,7 +66,7 @@ class Blockchain {
         return new Promise(async (resolve, reject) => {
             try{
                 self.validateChain().then(data => {
-                    if(Array.isArray(data)) {
+                    if(data) {
                         reject(data)
                     } else {
                         console.log("_addBlock valid chain")
@@ -163,7 +163,7 @@ class Blockchain {
     getBlockByHeight(height) {
         let self = this;
         return new Promise((resolve, reject) => {
-            let block = self.chain.filter(p => p.height === height)[0];
+            let block = self.chain.find(p => p.height === height)[0];
             if(block){
                 resolve(block);
             } else {
@@ -203,18 +203,22 @@ class Blockchain {
         let self = this;
         let errorLog = [];
         return new Promise(async (resolve, reject) => {
-            for(let i = 0; i<self.chain.length; i++) {
-                self.chain[i].validate().then(result => {
-                    if(result === "INVALID") {
-                        errorLog.push(i)
-                    }
-                    //validate function checks previous hash
-                    if(self.chain.height > 0 && self.chain[i].previousBlockHash !== self.chain[i-1].hash) {
-                        errorLog.push(i)
-                    }
-                }).catch(error => console.log(error))
+            try{
+                for(let i = 0; i<self.chain.length; i++) {
+                    self.chain[i].validate().then(result => {
+                        if(result) {
+                            errorLog.push(i)
+                        }
+                        //validate function checks previous hash
+                        if(self.chain.height > 0 && self.chain[i].previousBlockHash !== self.chain[i-1].hash) {
+                            errorLog.push(i)
+                        }
+                    }).catch(error => console.log(error))
+                }
+                errorLog.length === 0 ? resolve("Valid Chain") : reject (errorLog)
+            } catch (exception) {
+                reject(exception)
             }
-            errorLog.length === 0 ? resolve("Valid Chain") : reject (errorLog)
         });
     }
 
